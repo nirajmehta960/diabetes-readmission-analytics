@@ -121,15 +121,19 @@ def run_cleaning_pipeline(
     save_path = save_path if save_path is not None else DEFAULT_PREPROCESSED_PATH
 
     df, _ = load_raw(data_path, ids_path)
+    print(f"Started with: {len(df):,} rows")
     df = replace_missing(df)
     df = drop_identifiers(df)
     df = deduplicate_patients(df)
+    print(f"After dedup: {len(df):,} rows")
     df = handle_missing_values(df)
+    print(f"After removing invalid gender rows: {len(df):,} rows")
     df = reduce_medical_specialty_cardinality(df)
     df = map_diagnosis_columns(df)
     if "readmitted" in df.columns:
         df = binarize_target(df)
     df = drop_unusable_columns(df)
+    print(f"Final preprocessed rows: {len(df):,}")
 
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     df.to_csv(save_path, index=False)

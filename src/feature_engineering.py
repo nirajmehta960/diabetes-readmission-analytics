@@ -81,9 +81,17 @@ def one_hot_encode_categoricals(
 
 
 def add_aggregate_features(df: pd.DataFrame) -> pd.DataFrame:
-    """Add total_visits_prior and med_change_count."""
+    """Add aggregate and engineered features."""
     df = add_total_visits_prior(df)
     df = add_med_change_count(df)
+    
+    df["high_utilizer"] = (df["total_visits_prior"] >= 3).astype(int)
+    df["discharged_home"] = (df["discharge_disposition_id"] == 1).astype(int)
+    df["meds_per_day"] = df["num_medications"] / df["time_in_hospital"]
+    df["a1c_tested"] = df["A1Cresult"].notnull().astype(int)
+    df["any_diabetes_diag"] = df[["diag_1_cat", "diag_2_cat", "diag_3_cat"]].isin(["Diabetes"]).any(axis=1).astype(int)
+    df["complexity_score"] = df["number_diagnoses"] * df["num_medications"]
+    
     return df
 
 

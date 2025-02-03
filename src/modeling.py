@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.utils.class_weight import compute_sample_weight
 from sklearn.metrics import (
     roc_auc_score,
     classification_report,
@@ -27,7 +28,7 @@ DEFAULT_NUMERIC_COLS = [
     "time_in_hospital", "num_lab_procedures", "num_procedures",
     "num_medications", "number_outpatient", "number_inpatient",
     "number_emergency", "number_diagnoses", "total_visits_prior",
-    "med_change_count",
+    "med_change_count", "meds_per_day", "complexity_score",
 ]
 
 
@@ -86,7 +87,11 @@ def train_and_evaluate(models, X_train, X_test, y_train, y_test, use_scaled_for_
             y_pred = model.predict(X_test_scaled)
             y_proba = model.predict_proba(X_test_scaled)[:, 1]
         else:
-            model.fit(X_train, y_train)
+            if name == "Gradient Boosting":
+                sample_weights = compute_sample_weight(class_weight="balanced", y=y_train)
+                model.fit(X_train, y_train, sample_weight=sample_weights)
+            else:
+                model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
             y_proba = model.predict_proba(X_test)[:, 1]
         auc = roc_auc_score(y_test, y_proba)
