@@ -52,15 +52,6 @@ Several columns had substantial missing data. `weight` (97% missing) and `payer_
 
 ![Missing Values](images/eda_charts/missing_values.png)
 
-### Demographics Analysis
-Readmission rates vary by age group (peaks at 70–90), are relatively consistent across racial groups (~9–11%), and show similar patterns for both genders.
-
-![Demographics Analysis](images/eda_charts/demographics_analysis.png)
-
-### Clinical Feature Distributions
-The distribution of key clinical features — length of stay, number of medications, lab procedures, and diagnoses — broken down by readmission status. Readmitted patients tend to have slightly more medications and longer stays.
-
-![Clinical Distributions](images/eda_charts/clinical_distributions.png)
 
 ### Correlation Matrix
 Numeric feature correlations reveal that `number_inpatient` has the strongest individual correlation with readmission (0.165), followed by `number_emergency` (0.061) and `number_diagnoses` (0.050).
@@ -71,16 +62,6 @@ Numeric feature correlations reveal that `number_inpatient` has the strongest in
 The four most actionable risk factors identified: prior inpatient visits (strongest gradient, 8.4% → 34.6%), HbA1c testing status, medication complexity, and length of stay.
 
 ![Risk Factors](images/eda_charts/risk_factors.png)
-
-### Readmission by Primary Diagnosis
-Diabetes (13.0%) and Injury (12.2%) as primary diagnoses have the highest 30-day readmission rates, both above the overall average of 11.2%.
-
-![Diagnosis Readmission](images/eda_charts/diagnosis_readmission.png)
-
-### Key Drivers — Prior Visits, HbA1c, and Emergency Visits
-A closer look at the three most actionable readmission drivers: prior inpatient visits show a clear dose-response relationship, HbA1c testing reveals differences in readmission patterns, and prior emergency visits escalate risk similarly.
-
-![Key Drivers](images/eda_charts/key_drivers.png)
 
 ---
 
