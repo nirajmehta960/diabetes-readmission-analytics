@@ -8,8 +8,6 @@ This project analyzes **101,766 patient encounters** across **130 US hospitals**
 
 > **Bottom line:** A predictive model targeting 500 high-risk patients per hospital could prevent ~100 readmissions annually, saving an estimated **$1.5M per hospital per year**.
 
-![Executive KPIs](images/eda_charts/executive_kpis.png)
-
 ---
 
 ## Interactive Dashboard
@@ -92,36 +90,26 @@ A closer look at the three most actionable readmission drivers: prior inpatient 
 
 | Model               | AUC-ROC | Notes                                        |
 | ------------------- | ------- | -------------------------------------------- |
-| Logistic Regression | ~0.64   | Interpretable baseline (scaled features)     |
-| Random Forest       | ~0.65   | Handles non-linearity, class_weight balanced |
-| Gradient Boosting   | ~0.66   | Best performer in pipeline                   |
+| Logistic Regression | 0.69    | Interpretable baseline (scaled features)     |
+| Random Forest       | 0.68    | Handles non-linearity, class_weight balanced |
+| Gradient Boosting   | 0.68    | Balanced class weights, comparable to RF     |
 
-> **Note:** AUC-ROC of 0.63–0.67 is consistent with published benchmarks for this dataset (Strack et al., 2014). The model is used for risk stratification, not individual prediction; healthcare readmission is inherently challenging due to missing social determinants of health.
+> **Note:** AUC-ROC of 0.68–0.69 is consistent with published benchmarks for this dataset (Strack et al., 2014). The model is used for risk stratification, not individual prediction; healthcare readmission is inherently challenging due to missing social determinants of health.
 
 ### ROC Curve Comparison
-All four models (Logistic Regression, Random Forest, Gradient Boosting, XGBoost) perform similarly, with Gradient Boosting achieving the highest AUC-ROC of 0.644. The Precision-Recall curves (right) are more informative for this imbalanced dataset.
+All three models perform similarly, with Logistic Regression achieving the highest AUC-ROC of 0.69. The tight clustering of curves confirms that model choice matters less than feature engineering for this dataset.
 
 ![ROC Comparison](images/eda_charts/roc_comparison.png)
 
 ### Confusion Matrices
-Confusion matrices for all models show the trade-off between sensitivity and specificity. Logistic Regression favors recall (more liberal predictions), while Gradient Boosting is more conservative.
+Confusion matrices for all three models show balanced predictions after fixing the class imbalance handling. All models now properly predict both classes, with AUC values of 0.688 (LR), 0.681 (RF), and 0.683 (GB).
 
 ![Confusion Matrices](images/eda_charts/confusion_matrices.png)
 
-### Cross-Validation Stability
-5-fold cross-validation confirms model stability. Random Forest shows the tightest variance (most consistent), while Logistic Regression has the widest range but competitive mean performance.
-
-![Cross-Validation Comparison](images/eda_charts/cv_comparison.png)
-
 ### Feature Importance — Gradient Boosting
-The top predictors from the best-performing Gradient Boosting model: discharge destination (transfer to facility), number of prior inpatient visits, number of lab procedures, and number of medications.
+The top predictors from the Gradient Boosting model: number of prior inpatient visits, time in hospital, number of medications, and number of lab procedures.
 
 ![Feature Importance](images/eda_charts/feature_importance.png)
-
-### Logistic Regression — Interpretable Risk Factors
-Logistic regression coefficients provide clinical interpretability. Age brackets (70–80, 60–70) are the strongest positive predictors, while trauma/newborn admissions and certain diagnoses decrease risk.
-
-![LR Coefficients](images/eda_charts/lr_coefficients.png)
 
 ---
 
@@ -145,62 +133,50 @@ Conservative estimates show that flagging 500 high-risk patients per hospital an
 ## Project Structure
 
 ```
-healthcare-readmission-prediction/
-|
+diabetes-readmission-analytics/
+│
 ├── README.md
 ├── requirements.txt
 ├── .gitignore
-|
+│
 ├── data/
-|   ├── raw/                    # Original untouched dataset
-|   |   ├── diabetic_data.csv
-|   |   └── IDs_mapping.csv
-|   ├── preprocessed/           # After Phase 2 (cleaning only)
-|   |   └── diabetic_preprocessed.csv
-|   ├── featured/               # After Phase 3 (feature engineering and encoding)
-|   |   ├── diabetic_featured.csv
-|   |   └── model_ready.csv
-|   └── data_dictionary.md      # Column descriptions and mapping notes
-|
+│   └── raw/                    # Original untouched dataset (not tracked in Git)
+│       ├── diabetic_data.csv
+│       └── IDs_mapping.csv
+│
 ├── notebooks/
-|   ├── 01_data_profiling.ipynb       # Initial exploration and quality assessment
-|   ├── 02_data_cleaning.ipynb        # Cleaning, deduplication, missing values
-|   ├── 03_feature_engineering.ipynb  # New features, encoding, transformations
-|   ├── 04_eda.ipynb                 # Exploratory analysis and visualizations
-|   ├── 05_modeling.ipynb            # Model training, tuning, evaluation
-|   └── 06_insights_recommendations.ipynb  # Business insights and impact analysis
-|
+│   ├── 01_data_profiling.ipynb       # Initial exploration and quality assessment
+│   ├── 02_data_cleaning.ipynb        # Cleaning, deduplication, missing values
+│   ├── 03_feature_engineering.ipynb  # New features, encoding, transformations
+│   ├── 04_eda.ipynb                  # Exploratory analysis and visualizations
+│   ├── 05_modeling.ipynb             # Model training, tuning, evaluation
+│   └── 06_insights_recommendations.ipynb  # Business insights and impact analysis
+│
 ├── sql/
-|   ├── 01_create_tables.sql    # Load CSV into SQL database
-|   ├── 02_data_profiling.sql   # Profiling queries
-|   └── 03_validation_queries.sql  # Post-cleaning validation checks
-|
+│   ├── 01_create_tables.sql          # Load CSV into SQL database
+│   ├── 02_data_profiling.sql         # Profiling queries
+│   ├── 03_validation_queries.sql     # Post-cleaning validation checks
+│   ├── data_profiling.sql            # Extended profiling queries
+│   └── feature_queries.sql           # Feature-level SQL analysis
+│
 ├── src/
-|   ├── __init__.py
-|   ├── data_cleaning.py
-|   ├── feature_engineering.py
-|   ├── modeling.py
-|   ├── run_data_pipeline.py
-|   └── visualizations.py
-|
-├── model/                  # Saved trained model artifacts (.pkl, .joblib) from 05_modeling
-|   ├── best_model.pkl
-|   └── scaler.pkl
-|
+│   ├── __init__.py
+│   ├── data_cleaning.py              # Data preprocessing pipeline
+│   ├── feature_engineering.py        # Feature creation and encoding
+│   ├── modeling.py                   # Model training and evaluation
+│   ├── run_data_pipeline.py          # End-to-end pipeline runner
+│   └── visualizations.py             # Chart generation utilities
+│
+├── model/                             # Saved trained model artifacts
+│   ├── best_model.pkl
+│   └── scaler.pkl
+│
 ├── tests/
-|   └── test_cleaning.py    # Unit tests for data cleaning functions
-|
-├── reports/
-|   ├── project_report.pdf
-|   ├── executive_summary.pdf
-|   └── presentation.pptx
-|
+│   └── test_cleaning.py              # Unit tests for data cleaning functions
+│
 └── images/
-    ├── feature_importance.png
-    ├── confusion_matrix.png
-    ├── roc_curve.png
-    ├── eda_charts/          # 15 EDA and modeling visualizations
-    └── tableau/             # Tableau dashboard screenshots
+    ├── eda_charts/                    # EDA and modeling visualizations
+    └── tableau/                       # Tableau dashboard screenshots
         ├── dashboard_overview.png
         └── dashboard_deep_dive.png
 ```
@@ -213,7 +189,7 @@ healthcare-readmission-prediction/
 | -------------------- | -------------------------------------------------------------------- |
 | **Languages**        | Python, SQL                                                          |
 | **Data Analysis**    | Pandas, NumPy, SciPy                                                 |
-| **Machine Learning** | Scikit-learn (Logistic Regression, Random Forest, Gradient Boosting) |
+| **Machine Learning** | Scikit-learn (Logistic Regression, Random Forest, Gradient Boosting)  |
 | **Visualization**    | Matplotlib, Seaborn, Tableau                                         |
 | **Database**         | SQLite (optional, for SQL profiling)                                 |
 | **Dashboard**        | [Tableau Public](https://public.tableau.com/app/profile/niraj.mehta5678/viz/HospitalReadmissionRiskDashboard/dashboard_overview) |
@@ -228,8 +204,8 @@ If you want to reproduce the analysis or run the dashboard locally, follow these
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/nirajmehta/healthcare-readmission-analysis.git
-cd healthcare-readmission-analysis
+git clone https://github.com/nirajmehta960/diabetes-readmission-analytics.git
+cd diabetes-readmission-analytics
 ```
 
 ### 2. Set Up a Virtual Environment (Recommended)
