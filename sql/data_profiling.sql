@@ -5,7 +5,7 @@
 -- ============================================================
 
 -- 1. Dataset Overview: row count
-SELECT COUNT(*) AS total_encounters FROM diabetes_data;
+SELECT COUNT(*) AS total_encounters FROM diabetic_data;
 
 -- 2. Column-level null/missing analysis
 -- Note: '?' values are loaded as NULL via pandas na_values='?'
@@ -20,14 +20,14 @@ SELECT
     SUM(CASE WHEN diag_2 IS NULL THEN 1 ELSE 0 END) AS missing_diag2,
     SUM(CASE WHEN diag_3 IS NULL THEN 1 ELSE 0 END) AS missing_diag3,
     COUNT(*) AS total_rows
-FROM diabetes_data;
+FROM diabetic_data;
 
 -- 3. Target variable distribution (readmission status)
 SELECT
     readmitted,
     COUNT(*) AS count,
     ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) AS percentage
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY readmitted
 ORDER BY count DESC;
 
@@ -36,7 +36,7 @@ SELECT
     COUNT(*) AS total_encounters,
     COUNT(DISTINCT patient_nbr) AS unique_patients,
     COUNT(*) - COUNT(DISTINCT patient_nbr) AS duplicate_encounters
-FROM diabetes_data;
+FROM diabetic_data;
 
 -- 5. Age distribution by readmission status
 SELECT
@@ -44,7 +44,7 @@ SELECT
     readmitted,
     COUNT(*) AS patient_count,
     ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(PARTITION BY age), 2) AS pct_within_age
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY age, readmitted
 ORDER BY age, readmitted;
 
@@ -54,7 +54,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_30_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY race
 ORDER BY total DESC;
 
@@ -64,7 +64,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_30_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY gender
 ORDER BY total DESC;
 
@@ -74,7 +74,7 @@ SELECT
     COUNT(*) AS total_encounters,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 WHERE medical_specialty IS NOT NULL
 GROUP BY medical_specialty
 HAVING COUNT(*) > 100
@@ -88,7 +88,7 @@ SELECT
     COUNT(*) AS count,
     ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(PARTITION BY
         CASE WHEN A1Cresult IS NULL THEN 'Not Tested' ELSE 'Tested' END), 2) AS pct
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY hba1c_status, readmitted
 ORDER BY hba1c_status, readmitted;
 
@@ -103,7 +103,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY prior_inpatient_group
 ORDER BY readmit_rate;
 
@@ -114,7 +114,7 @@ SELECT
     MIN(time_in_hospital) AS min_days,
     MAX(time_in_hospital) AS max_days,
     COUNT(*) AS count
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY readmitted
 ORDER BY readmitted;
 
@@ -124,7 +124,7 @@ SELECT
     ROUND(AVG(num_medications), 2) AS avg_meds,
     MIN(num_medications) AS min_meds,
     MAX(num_medications) AS max_meds
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY readmitted
 ORDER BY readmitted;
 
@@ -134,7 +134,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY discharge_disposition_id
 HAVING COUNT(*) > 50
 ORDER BY readmit_rate DESC;
@@ -145,7 +145,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY insulin
 ORDER BY readmit_rate DESC;
 
@@ -156,6 +156,6 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY change, diabetesMed
 ORDER BY readmit_rate DESC;

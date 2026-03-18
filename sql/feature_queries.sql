@@ -9,7 +9,7 @@ SELECT
     patient_nbr,
     (number_outpatient + number_inpatient + number_emergency) AS total_visits_prior,
     readmitted
-FROM diabetes_data
+FROM diabetic_data
 ORDER BY total_visits_prior DESC
 LIMIT 20;
 
@@ -24,7 +24,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate_30
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY utilization_tier
 ORDER BY readmit_rate_30 DESC;
 
@@ -46,7 +46,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 WHERE diag_1 IS NOT NULL
 GROUP BY diagnosis_category
 ORDER BY readmit_rate DESC;
@@ -68,7 +68,7 @@ FROM (
          CASE WHEN pioglitazone != 'No' THEN 1 ELSE 0 END +
          CASE WHEN rosiglitazone != 'No' THEN 1 ELSE 0 END +
          CASE WHEN insulin != 'No' THEN 1 ELSE 0 END) AS med_changes
-    FROM diabetes_data
+    FROM diabetic_data
 ) sub
 GROUP BY med_changes
 ORDER BY med_changes;
@@ -86,7 +86,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY discharge_group
 ORDER BY readmit_rate DESC;
 
@@ -103,7 +103,7 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY admission_type
 ORDER BY readmit_rate DESC;
 
@@ -118,7 +118,7 @@ SELECT
     END AS diag_group,
     COUNT(*) AS total,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 WHERE diag_1 IS NOT NULL
 GROUP BY age, diag_group
 HAVING COUNT(*) > 50
@@ -135,6 +135,6 @@ SELECT
     COUNT(*) AS total,
     SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) AS readmit_30,
     ROUND(SUM(CASE WHEN readmitted = '<30' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS readmit_rate
-FROM diabetes_data
+FROM diabetic_data
 GROUP BY diagnosis_count_group
 ORDER BY diagnosis_count_group;

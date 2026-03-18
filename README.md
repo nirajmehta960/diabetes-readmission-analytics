@@ -40,28 +40,40 @@ The deep dive page shows a risk matrix (total visits prior vs. num medications),
 
 ---
 
-## Exploratory Data Analysis (EDA)
-
-### Target Variable Distribution
-Only **11.2%** of patients are readmitted within 30 days, creating a significant class imbalance that required specialized handling (balanced class weights, SMOTE considerations).
-
-![Readmission Overview](images/eda_charts/readmission_overview.png)
-
-### Data Quality — Missing Values
-Several columns had substantial missing data. `weight` (97% missing) and `payer_code` (40% missing) were dropped; `medical_specialty` (49%) and `A1Cresult` (83%) were imputed or retained with "Unknown" category.
-
-![Missing Values](images/eda_charts/missing_values.png)
-
-
-### Correlation Matrix
-Numeric feature correlations reveal that `number_inpatient` has the strongest individual correlation with readmission (0.165), followed by `number_emergency` (0.061) and `number_diagnoses` (0.050).
-
-![Correlation Matrix](images/eda_charts/correlation_matrix.png)
-
-### Key Risk Factors
-The four most actionable risk factors identified: prior inpatient visits (strongest gradient, 8.4% → 34.6%), HbA1c testing status, medication complexity, and length of stay.
-
 ![Risk Factors](images/eda_charts/risk_factors.png)
+
+---
+
+## SQL ETL & Analytics Pipeline
+
+This project includes a production-grade **SQL ETL (Extract, Transform, Load)** pipeline built in SQLite. It transforms raw healthcare data into a structured star schema optimized for BI and advanced analytics.
+
+### 1. Data Architecture
+The pipeline follows a tiered data architecture:
+- **Staging (`stg_encounters`)**: Standardizes missing values (`?` → `NULL`) and derives initial boolean flags.
+- **Dimensions**: Built using robust "fill-down" logic to handle the hierarchical structure of `IDs_mapping`.
+  - `dim_admission_type`, `dim_discharge_disposition`, `dim_admission_source`, `dim_medical_specialty`
+- **Facts**: 
+  - `fct_encounters`: Enriched encounter-level data with ICD-9 diagnosis categorizations.
+  - `fct_patient_latest`: Snapshot of the most recent encounter per patient for longitudinal analysis.
+- **Marts (Views)**: Consumption-ready views for performance.
+  - `mart_readmission_kpis`, `mart_readmission_by_age_diag`, `mart_high_utilizers`
+
+### 2. SQL-to-Python Visualization Suite
+A bridge script (`src/sql_charts.py`) leverages the power of SQL for heavy aggregation and Python (Seaborn/Matplotlib) for high-fidelity visualization.
+
+#### SQL Automated Insights
+The following charts are generated directly from the SQL Mart views:
+
+| Insight | Visualization |
+| :--- | :--- |
+| **Readmission by Age & Diagnosis** | ![Age/Diag](images/sql_charts/01_readmission_age_diag.png) |
+| **Top 10 Specialties by Risk** | ![Specialties](images/sql_charts/02_top_specialties.png) |
+| **Utilization Tier Impact** | ![Utilization](images/sql_charts/03_utilization_trends.png) |
+| **Length of Stay Trends** | ![LOS](images/sql_charts/04_los_by_utilization.png) |
+| **Executive Summary (SQL)** | ![Summary](images/sql_charts/05_executive_summary.png) |
+
+---
 
 ---
 
@@ -189,20 +201,42 @@ git clone https://github.com/nirajmehta960/diabetes-readmission-analytics.git
 cd diabetes-readmission-analytics
 ```
 
-### 2. Set Up a Virtual Environment (Recommended)
+### 2. Set Up a Virtual Environment 
 
 ```bash
-# Create a virtual environment
 python3 -m venv venv
-
-# Activate the virtual environment
-# On macOS/Linux:
-source venv/bin/activate
-# On Windows:
-# venv\Scripts\activate
+source venv/bin/activate  # On macOS/Linux
 ```
 
-### 3. Install Dependencies
+### 3. Run the SQL ETL & Visualization Suite
+
+**Step A: Initialize the Database**
+```bash
+# Create DB and import raw CSVs
+sqlite3 data/diabetes.sqlite <<EOF
+.mode csv
+.import data/raw/diabetic_data.csv diabetic_data
+.import data/raw/IDS_mapping.csv IDs_mapping
+.quit
+EOF
+```
+
+**Step B: Run the ETL Pipeline**
+Run the verified ETL scripts in sequence:
+```bash
+sqlite3 data/diabetes.sqlite < sql/etl/00_init.sql
+sqlite3 data/diabetes.sqlite < sql/etl/10_staging.sql
+sqlite3 data/diabetes.sqlite < sql/etl/20_dimensions.sql
+sqlite3 data/diabetes.sqlite < sql/etl/30_facts.sql
+sqlite3 data/diabetes.sqlite < sql/etl/40_marts.sql
+```
+
+**Step C: Generate Python Charts from SQL Marts**
+```bash
+python3 src/sql_charts.py
+```
+
+### 4. Install Dependencies for ML Pipeline
 
 ```bash
 pip install -r requirements.txt
