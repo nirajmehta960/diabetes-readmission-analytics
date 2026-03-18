@@ -6,6 +6,14 @@ data/preprocessed/*
 data/featured/*
 !data/featured/.gitkeep
 
+# SQLite files
+data/diabetes.sqlite
+data/diabetes.sqlite-shm
+data/diabetes.sqlite-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
 # General data extensions
 *.csv
 *.parquet

@@ -60,7 +60,7 @@ The pipeline follows a tiered data architecture:
   - `mart_readmission_kpis`, `mart_readmission_by_age_diag`, `mart_high_utilizers`
 
 ### 2. SQL-to-Python Visualization Suite
-A bridge script (`src/sql_charts.py`) leverages the power of SQL for heavy aggregation and Python (Seaborn/Matplotlib) for high-fidelity visualization.
+A bridge script (`src/sql_pipeline/run_viz.py`) leverages the power of SQL for heavy aggregation and Python (Seaborn/Matplotlib) for high-fidelity visualization.
 
 #### SQL Automated Insights
 The following charts are generated directly from the SQL Mart views:
@@ -154,11 +154,18 @@ diabetes-readmission-analytics/
 │
 ├── src/
 │   ├── __init__.py
-│   ├── data_cleaning.py              # Data preprocessing pipeline
-│   ├── feature_engineering.py        # Feature creation and encoding
-│   ├── modeling.py                   # Model training and evaluation
-│   ├── run_data_pipeline.py          # End-to-end pipeline runner
-│   └── visualizations.py             # Chart generation utilities
+│   ├── python_pipeline/            # Python-based ETL and ML pipeline
+│   │   ├── __init__.py
+│   │   ├── data_cleaning.py        # Data preprocessing pipeline
+│   │   ├── feature_engineering.py  # Feature creation and encoding
+│   │   ├── modeling.py             # Model training and evaluation
+│   │   ├── run_pipeline.py         # End-to-end pipeline runner
+│   │   └── visualizations.py       # Chart generation utilities
+│   │
+│   └── sql_pipeline/               # SQL-first ETL and analytics
+│       ├── __init__.py
+│       ├── run_etl.py              # Runner for SQL ETL scripts
+│       └── run_viz.py              # Generator for SQL-based charts
 │
 ├── model/                             # Saved trained model artifacts
 │   ├── best_model.pkl
@@ -233,7 +240,7 @@ sqlite3 data/diabetes.sqlite < sql/etl/40_marts.sql
 
 **Step C: Generate Python Charts from SQL Marts**
 ```bash
-python3 src/sql_charts.py
+python3 src/sql_pipeline/run_viz.py
 ```
 
 ### 4. Install Dependencies for ML Pipeline
@@ -272,19 +279,19 @@ From the project root, run preprocessing and/or feature engineering with default
 Run the full data pipeline (Phase 2 + Phase 3):
 
 ```bash
-python src/run_data_pipeline.py
+python src/python_pipeline/run_pipeline.py
 ```
 
 Run preprocessing only (Phase 2; writes `data/preprocessed/diabetic_preprocessed.csv`):
 
 ```bash
-python src/data_cleaning.py
+python src/python_pipeline/data_cleaning.py
 ```
 
 Run feature engineering only (Phase 3; reads preprocessed, writes `data/featured/diabetic_featured.csv` and `data/featured/model_ready.csv`):
 
 ```bash
-python src/feature_engineering.py
+python src/python_pipeline/feature_engineering.py
 ```
 
 ### 6. Run Tests

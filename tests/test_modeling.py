@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.modeling import (
+from src.python_pipeline.modeling import (
     prepare_train_test,
     scale_numeric,
     get_default_models,

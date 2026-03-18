@@ -8,12 +8,12 @@ import sys
 import os
 
 # Ensure project root is on path when run as script
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
-from src.data_cleaning import run_cleaning_pipeline, DEFAULT_PREPROCESSED_PATH
-from src.feature_engineering import run_feature_engineering_pipeline, DEFAULT_FEATURED_PATH, DEFAULT_MODEL_READY_PATH
+from src.python_pipeline.data_cleaning import run_cleaning_pipeline, DEFAULT_PREPROCESSED_PATH
+from src.python_pipeline.feature_engineering import run_feature_engineering_pipeline, DEFAULT_FEATURED_PATH, DEFAULT_MODEL_READY_PATH
 
 
 def run_pipeline(

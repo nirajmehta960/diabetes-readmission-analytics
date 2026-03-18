@@ -1,5 +1,5 @@
 import pandas as pd
-from src.data_cleaning import map_icd9, binarize_target, drop_unusable_columns
+from src.python_pipeline.data_cleaning import map_icd9, binarize_target, drop_unusable_columns
 
 def test_map_icd9():
     assert map_icd9(250) == "Diabetes"

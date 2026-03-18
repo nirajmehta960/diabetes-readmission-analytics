@@ -116,7 +116,7 @@ def get_feature_importances(model, feature_names):
 
 
 # Default path for model-ready data (project root relative to this file)
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_MODEL_READY_PATH = os.path.join(_PROJECT_ROOT, "data", "featured", "model_ready.csv")
 DEFAULT_MODEL_DIR = os.path.join(_PROJECT_ROOT, "model")
 
@@ -171,7 +171,7 @@ if __name__ == "__main__":
     # Generate visualizations
     import sys
     sys.path.insert(0, _PROJECT_ROOT)
-    from src.visualizations import plot_roc_curves, plot_confusion_matrices, plot_feature_importance
+    from src.python_pipeline.visualizations import plot_roc_curves, plot_confusion_matrices, plot_feature_importance
     df = pd.read_csv(DEFAULT_MODEL_READY_PATH)
     X_train, X_test, y_train, y_test = prepare_train_test(df)
     

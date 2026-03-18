@@ -14,7 +14,7 @@ import sqlite3
 from pathlib import Path
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "diabetes.sqlite"
 DEFAULT_SQL_DIR = PROJECT_ROOT / "sql" / "etl"
 

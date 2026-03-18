@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 # Default paths (relative to project root). Resolved when run as script or via run_data_pipeline.
-_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_PREPROCESSED_PATH = os.path.join(_PROJECT_ROOT, "data", "preprocessed", "diabetic_preprocessed.csv")
 DEFAULT_FEATURED_PATH = os.path.join(_PROJECT_ROOT, "data", "featured", "diabetic_featured.csv")
 DEFAULT_MODEL_READY_PATH = os.path.join(_PROJECT_ROOT, "data", "featured", "model_ready.csv")

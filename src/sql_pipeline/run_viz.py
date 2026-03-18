@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 
 # 1. Configuration (Dynamically calculated for portability)
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DB_PATH = PROJECT_ROOT / "data" / "diabetes.sqlite"
 SAVE_DIR = PROJECT_ROOT / "images" / "sql_charts"
 os.makedirs(SAVE_DIR, exist_ok=True)
